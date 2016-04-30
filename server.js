@@ -1,16 +1,81 @@
 var express = require('express');
+var mongoose = require('mongoose');
+var path = require('path');
+var cookieParser = require('cookie-parser');
+var bodyParser = require('body-parser');
+var exphbs = require('express-handlebars');
+var expressValidator = require('express-validator');
+var flash = require('connect-flash');
+var session = require('express-session');
+var passport = require('passport');
+var localStrategy = require('passport-local').Strategy;
+var mongo = require('mongodb');
 
+mongoose.connect('mongodb://localhost/sds');
+var db = mongoose.connection;
+
+var routes = require('./routes/index');
+var users = require('./routes/users');
+
+//INIT APPLICATION
 var app = express();
 
-app.set('views', './public/views');
-app.set('view engine', 'ejs');
+//VIEW ENGINE
+app.set('views', path.join(__dirname, 'views'));
+app.engine('handlebars', exphbs({defaultLayout: 'layout'}));
+app.set('view engine', 'handlebars');
 
-app.use(express.static(__dirname + '/public'));
+//BODYPARSER
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({extended: false}));
+app.use(cookieParser());
 
-app.get('/', function (req, res) {
-    res.render('pages/home', {
-        title: 'Welcome'
-    });
+//SET STATIC FOLDER
+app.use(express.static(path.join(__dirname, 'public')));
+
+//EXPRESS SESSION
+app.use(session({
+    secret: 'secret',
+    saveUnitialized: true,
+    resave: true
+}));
+
+//EXPRESS VALIDATOR
+app.use(expressValidator({
+    errorFormatter: function (param, msg, value) {
+        var namespace = param.split('.')
+            , root = namespace.shift()
+            , formParam = root;
+
+        while (namespace.length) {
+            formParam += '[' + namespace.shift() + ']';
+        }
+        return {
+            param: formParam,
+            msg: msg,
+            value: value
+        };
+    }
+}));
+
+//CONNECT FLASH
+app.use(flash());
+
+//GLOBAL VARIABLES
+app.use(function (req, res, next) {
+    res.locals.success_msg = req.flash('success_msg');
+    res.locals.error_msg = req.flash('error_msg');
+    res.locals.error = req.flash('error');
+    next();
 });
 
-app.listen(3000);
+app.use('/', routes);
+app.use('/users', users);
+
+
+//SET PORT
+app.set('port', 3000);
+
+app.listen(app.get('port'), function () {
+    console.log('Server is running on port ' + app.get('port'));
+});
