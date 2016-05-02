@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <!--<link rel="icon" href="../../favicon.ico">-->
+
+    <title>Doljnik</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+    <!-- JQuery -->
+    <script src="/js/jquery.min.js"></script>
+    <!-- Bootstrap core JS -->
+    <script src="/js/bootstrap.min.js"></script>
+    <!-- Custom styles for this template -->
+    <link href="/css/style.css" rel="stylesheet">
+</head>
+<!--<script>$(document).ready(function () {-->
+<!--console.log("ready!");-->
+<!--});</script>-->
+<body>
+
+<div class="container">
+    <div class="header clearfix">
+        <nav>
+            <ul class="nav nav-pills pull-right">
+                <li role="presentation"><a href="/">Dashboard</a></li>
+                {{#unless user }}
+                    <li role="presentation"><a href="/users/login">Login</a></li>
+                    <li role="presentation"><a href="/users/register">Register</a></li>
+                {{/unless}}
+                {{#if user }}
+                    <li role="presentation"><a href="/users/logout">Logout</a></li>
+                {{/if}}
+            </ul>
+        </nav>
+        <h3 class="text-muted">Doljnik</h3>
+    </div>
+
+    <!--<div class="jumbotron">-->
+    <!--&lt;!&ndash;<h1>Jumbotron heading</h1>&ndash;&gt;-->
+    <!--&lt;!&ndash;<p class="lead">Cras justo odio, dapibus ac facilisis in, egestas eget quam. Fusce dapibus, tellus ac cursus commodo, tortor mauris condimentum nibh, ut fermentum massa justo sit amet risus.</p>&ndash;&gt;-->
+    <!--&lt;!&ndash;<p><a class="btn btn-lg btn-success" href="#" role="button">Sign up today</a></p>&ndash;&gt;-->
+
+    <!--</div>-->
+
+    <div class="row marketing">
+        <!--<div class="col-lg-6">-->
+        {{# if success_msg }}
+            <div class="alert alert-success">
+                {{ success_msg }}
+            </div>
+        {{/if}}
+
+        {{# if error_msg }}
+            <div class="alert alert-danger">
+                {{ error_msg }}
+            </div>
+        {{/if}}
+        {{# if error }}
+            <div class="alert alert-error">
+                {{ error }}
+            </div>
+        {{/if}}
+        {{{ body }}}
+        <!--</div>-->
+    </div>
+
+    <footer class="footer">
+        <p>&copy; 2016 Doljnik</p>
+    </footer>
+
+</div> <!-- /container -->
+</body>
+</html>
+

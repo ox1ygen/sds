@@ -1,0 +1,42 @@
+<h2 class="page-header">Register</h2>
+{{# if errors}}
+    {{# each errors}}
+        <!--<div class="alert alert-danger">-->
+        <div class="alert alert-danger fade in">
+            <a href="#" class="close" data-dismiss="alert" aria-label="close">&times;</a>
+            <strong>Error!</strong> {{msg}}
+        </div>
+
+        <!--</div>-->
+    {{/each}}
+{{/if}}
+
+<form method="POST" action="/users/register" class="" role="form">
+    <div class="form-group">
+        <label class="" for="name">Name:</label>
+        <input type="text" class="form-control" name="name" value="{{#if params}}{{ params.[0]}}{{/if}}" id="username"
+               placeholder="John Smith">
+    </div>
+    <div class="form-group">
+        <label class="" for="username">Username:</label>
+        <input type="text" class="form-control" value="{{#if params}}{{ params.[1]}}{{/if}}" name="username"
+               id="username"
+               placeholder="johnsmith2009">
+    </div>
+    <div class="form-group">
+        <label class="" for="email">Email:</label>
+        <input type="email" class="form-control" name="email" value="{{#if params}}{{ params.[2]}}{{/if}}" id="email"
+               placeholder="johnsmith@email.com">
+    </div>
+    <div class="form-group">
+        <label class="" for="pwd">Password:</label>
+        <input type="password" class="form-control" name="password" id="pwd" placeholder="">
+    </div>
+    <div class="form-group">
+        <label class="" for="confirm_pwd">Confirm Password:</label>
+        <input type="password" class="form-control" name="confirm_password" id="confirm_pwd" placeholder="">
+    </div>
+    <div class="form-group">
+        <button type="submit" class="btn btn-default">Submit</button>
+    </div>
+</form>
