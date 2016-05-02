@@ -11,7 +11,7 @@ var passport = require('passport');
 
 //CONNECTION TO MONGO
 mongoose.connect('mongodb://localhost/sds');
-var db = mongoose.connection;
+//var db = mongoose.connection;
 
 var routes = require('./routes/index');
 var users = require('./routes/users');
@@ -42,6 +42,7 @@ app.use(session({
 //PASSPORT INIT
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(passport.authenticate('remember-me'));
 
 //EXPRESS VALIDATOR
 app.use(expressValidator({

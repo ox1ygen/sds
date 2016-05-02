@@ -2,8 +2,11 @@ var express = require('express');
 var router = express.Router();
 var passport = require('passport');
 var LocalStrategy = require('passport-local').Strategy;
+var RememberMeStrategy = require('passport-remember-me').Strategy;
 var expressValidator = require('express-validator');
 var User = require('../models/users');
+var Token = require('../models/tokens');
+
 
 
 //REGISTER
@@ -137,6 +140,35 @@ passport.use(new LocalStrategy(
         });
     }));
 
+//PASSPORT REMEMBER ME STRATEGY
+passport.use(new RememberMeStrategy(
+    function (token, done) {
+        console.log("Tokens start validating");
+        console.log("Tokens all = ", JSON.stringify(Token));
+        Token.consumeRememberMeToken(token, function (err, id) {
+            console.log("Token for search is ", JSON.stringify(token));
+            if (err) {
+                return done(err);
+            }
+            if (!id) {
+                return done(null, false);
+            }
+            console.log("TOKEN IS FOUND, UP TO USER CHECK");
+            User.getUserById(id, function (err, user) {
+                if (err) {
+                    return done(err);
+                }
+                if (!user) {
+                    return done(null, false);
+                }
+                return done(null, user);
+            });
+        });
+    },
+    Token.issueToken
+));
+
+
 //SERIALIZATION AND DESERIALIZATION
 passport.serializeUser(function (user, done) {
     done(null, user.id);
@@ -150,12 +182,38 @@ passport.deserializeUser(function (id, done) {
 
 
 //LOGIN
+//router.post('/login',
+//    passport.authenticate('local', {
+//        successRedirect: '/',
+//        failureRedirect: '/users/login',
+//        failureFlash: true
+//    }),
+//    function (req, res) {
+//        res.redirect('/');
+//    }
+//);
+
 router.post('/login',
-    passport.authenticate('local', {
-        successRedirect: '/',
-        failureRedirect: '/users/login',
-        failureFlash: true
-    }),
+    passport.authenticate('local', {failureRedirect: '/users/login', failureFlash: true}),
+    function (req, res, next) {
+        // Issue a remember me cookie if the option was checked
+        if (!req.body.remember_me) {
+            console.log("remember me is not taken");
+            return next();
+        }
+
+        console.log("remember me is taken");
+        //console.log("Tokens all = ", JSON.stringify(Token.tokens));
+        Token.issueToken(req.user, function (err, token) {
+            if (err) {
+                return next(err);
+            }
+            console.log("token = " + token);
+            res.cookie('remember_me', token, {path: '/', httpOnly: true, maxAge: 604800000});
+            return next();
+        });
+        //console.log("Tokens all = ", JSON.stringify(Token.tokens));
+    },
     function (req, res) {
         res.redirect('/');
     });
@@ -164,6 +222,7 @@ router.post('/login',
 router.get('/logout', function (req, res) {
     req.logout();
 
+    res.clearCookie('remember_me');
     req.flash('success_msg', 'You are logged out');
 
     res.redirect('/users/login');
